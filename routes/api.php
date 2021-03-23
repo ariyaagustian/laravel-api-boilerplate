@@ -19,7 +19,12 @@ use Illuminate\Support\Facades\Route;
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 
-Route::middleware('auth:api')->group( function () {
-    Route::post('logout', [AuthController::class, 'logout']);
-    Route::resource('roles', RoleController::class);
+Route::middleware(['auth:api', 'role'])->group( function () {
+    Route::middleware(['scope:Superadmin,Manager,User'])->post('logout', [AuthController::class, 'logout']);
+
+    Route::middleware(['scope:Superadmin,Manager,User'])->get('roles', [RoleController::class, 'index']);
+    Route::middleware(['scope:Superadmin,Manager'])->get('roles/{id}', [RoleController::class, 'show']);
+    Route::middleware(['scope:Superadmin'])->post('roles', [RoleController::class, 'store']);
+    Route::middleware(['scope:Superadmin'])->put('roles/{id}', [RoleController::class, 'update']);
+    Route::middleware(['scope:Superadmin'])->delete('roles/{id}', [RoleController::class, 'destroy']);
 });
